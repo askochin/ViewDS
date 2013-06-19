@@ -37,19 +37,21 @@ public class ViewDsServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
+	    String rootContextName = "jdbc";
+	    
 	    try {
             Context initContext = new InitialContext();
-            Object jdbcEntry = initContext.lookup("java:/comp/env/jdbc");
+            Object jdbcEntry = initContext.lookup(rootContextName);
             if (jdbcEntry == null) {
                 response.getWriter().write("Not found JDBC context in JNDI");
             } else {
-                NamingEnumeration<NameClassPair> list = initContext.list("java:/comp/env/jdbc");
+                NamingEnumeration<NameClassPair> list = initContext.list(rootContextName);
                 while (list.hasMore()) {
                     
                     NameClassPair nc = list.next();
                     response.getWriter().write("\r\n\r" + nc.getName() + ": " + nc.getClassName() + ": ");
                     
-                    Object obj = initContext.lookup("java:/comp/env/jdbc/" + nc.getName());
+                    Object obj = initContext.lookup(rootContextName + "/" + nc.getName());
                     if (obj instanceof DataSource) {
                         response.getWriter().write(getConnectionTestResult( (DataSource) obj));
                     } else {
